@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, status
 from src.books.router import book_router
 from contextlib import asynccontextmanager
+from src.auth.routers import auth_router
+
 import asyncpg
 from src.db.main import init_db
 
@@ -20,3 +22,4 @@ version = "v1"
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(book_router, prefix="/book", tags=["books"])  
+app.include_router(auth_router, prefix="/auth", tags=["auth"]) 

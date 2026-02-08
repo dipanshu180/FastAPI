@@ -20,10 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from typing import AsyncGenerator
 from sqlmodel import SQLModel
 
-from src.config import config
+from src.config import Config
 
 async_engine = create_async_engine(
-    config.DATABASE_URL,
+    Config.DATABASE_URL,
     echo=True
 )
 
