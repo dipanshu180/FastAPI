@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
+from src.auth.models import User
 from src.books.service import BookService
 from src.db.main import get_session
 
@@ -16,41 +17,41 @@ acccess_token_bearer = AccessTokenBearer()
 role_checker = Depends(RoleChecker(["admin", "user"]))
 
 
-# @book_router.get("/", response_model=List[Book], dependencies=[role_checker])
-# async def get_all_books(
-#     session: AsyncSession = Depends(get_session),
-#     _: dict = Depends(acccess_token_bearer),
-# ):
-#     books = await book_service.get_all_books(session)
-#     return books
+@book_router.get("/", response_model=List[Book], dependencies=[role_checker])
+async def get_all_books(
+    session: AsyncSession = Depends(get_session),
+    _: dict = Depends(acccess_token_bearer),
+):
+    books = await book_service.get_all_books(session)
+    return books
 
 
-# @book_router.get(
-#     "/user/{user_uid}", response_model=List[Book], dependencies=[role_checker]
-# )
-# async def get_user_book_submissions(
-#     user_uid: str,
-#     session: AsyncSession = Depends(get_session),
-#     _: dict = Depends(acccess_token_bearer),
-# ):
-#     books = await book_service.get_user_books(user_uid, session)
-#     return books
+@book_router.get(
+    "/user/{user_uid}", response_model=List[Book], dependencies=[role_checker]
+)
+async def get_user_book_submissions(
+    user_uid: str,
+    session: AsyncSession = Depends(get_session),
+    _: dict = Depends(acccess_token_bearer),
+):
+    books = await book_service.get_user_books(user_uid, session)
+    return books
 
 
-# @book_router.post(
-#     "/",
-#     status_code=status.HTTP_201_CREATED,
-#     response_model=Book,
-#     dependencies=[role_checker],
-# )
-# async def create_a_book(
-#     book_data: BookCreateModel,
-#     session: AsyncSession = Depends(get_session),
-#     token_details: dict = Depends(acccess_token_bearer),
-# ) -> dict:
-#     user_id = token_details.get("user")["user_uid"]
-#     new_book = await book_service.create_book(book_data, user_id, session)
-#     return new_book
+@book_router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Book,
+    
+)
+async def create_a_book(
+    book_data: BookCreateModel,
+    session: AsyncSession = Depends(get_session),
+    token_details: dict = Depends(acccess_token_bearer),
+) -> dict:
+    user_id = token_details.get("user")["uid"]
+    new_book = await book_service.create_book(book_data, user_id, session)
+    return new_book
 
 
 # @book_router.get(
