@@ -59,7 +59,7 @@ class Tag(SQLModel, table=True):
 
 class Book(SQLModel, table=True):
     __tablename__ = "books"
-    ui  d: uuid.UUID = Field(
+    uid: uuid.UUID = Field(
         sa_column=Column(pg.UUID, nullable=False, primary_key=True, default=uuid.uuid4)
     )
     title: str
