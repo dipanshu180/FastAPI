@@ -1,25 +1,46 @@
-from fastapi import FastAPI, HTTPException, status
-from src.books.router import book_router
-from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from src.auth.routers import auth_router
+from src.books.router import book_router
+from src.reviews.router import review_router
+from src.tags.router import tags_router
+from .errors import register_all_errors
+from .middleware import register_middleware
 
-import asyncpg
-from src.db.main import init_db
-
-# Define the lifespan event handlers for startup and shutdown
-# These handlers will print messages when the server starts and stops.
-# asynccontextmanager is used to create an asynchronous context manager for the lifespan events.
-# contextlib.asynccontextmanager allows us to define setup and teardown logic for the FastAPI application.
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print(f"Server started")
-    await init_db()
-    yield
-    print("server stop")
 
 version = "v1"
 
-app = FastAPI(lifespan=lifespan)
+description = """
+A REST API for a book review web service.
 
-app.include_router(book_router, prefix="/book", tags=["books"])  
-app.include_router(auth_router, prefix="/auth", tags=["auth"]) 
+This REST API is able to;
+- Create Read Update And delete books
+- Add reviews to books
+- Add tags to Books e.t.c.
+    """
+
+version_prefix =f"/api/{version}"
+
+app = FastAPI(
+    title="Bookly",
+    description=description,
+    # version=version,
+    # license_info={"name": "MIT License", "url": "https://opensource.org/license/mit"},
+    # contact={
+    #     "name": "Ssali Jonathan",
+    #     "url": "https://github.com/jod35",
+    #     "email": "ssalijonathank@gmail.com",
+    # },
+    # terms_of_service="httpS://example.com/tos",
+    # openapi_url=f"{version_prefix}/openapi.json",
+    # docs_url=f"{version_prefix}/docs",
+    # redoc_url=f"{version_prefix}/redoc"
+)
+
+register_all_errors(app)
+register_middleware(app)
+ 
+
+app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])
+app.include_router(auth_router, prefix=f"{version_prefix}/auth", tags=["auth"])
+app.include_router(review_router, prefix=f"{version_prefix}/reviews", tags=["reviews"])
+app.include_router(tags_router, prefix=f"{version_prefix}/tags", tags=["tags"])
